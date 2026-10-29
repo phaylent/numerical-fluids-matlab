@@ -12,7 +12,7 @@ MATLAB solvers for numerical fluid dynamics, built from scratch to study discret
 
 ## Requirements
 
-MATLAB R2016b or newer (scripts use local functions). No additional toolboxes needed.
+MATLAB R2020a or newer (scripts use local functions and graphics). No additional toolboxes needed.
 
 ## Notes
 
