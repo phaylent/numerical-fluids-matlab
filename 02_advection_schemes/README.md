@@ -4,32 +4,51 @@ A MATLAB study of how the choice of time integrator and spatial derivative schem
 
 ## Problem
 
-$$\frac{\partial u}{\partial t} + a\frac{\partial u}{\partial x} = 0, \qquad x \in [-10, 10] \text{ (periodic)}, \qquad u(x,0) = e^{-x^2/2}$$
+```math
+\frac{\partial u}{\partial t} + a\frac{\partial u}{\partial x} = 0, \qquad x \in [-10, 10] \text{ (periodic)}, \qquad u(x,0) = e^{-x^2/2}
+```
 
-with $a = 1$ and final time $t = 20$. The exact solution is the initial profile translated by $at$ and wrapped around the periodic domain. Because the domain length (20) equals $a\,t_{end}$, the pulse makes exactly one lap and **the exact solution at $t = 20$ equals the initial condition**. Any visible shift or ripple is therefore numerical error.
+with $`a = 1`$ and final time $`t = 20`$. The exact solution is the initial profile translated by $`at`$ and wrapped around the periodic domain. Because the domain length (20) equals $`a\,t_{\text{end}}`$, the pulse makes exactly one lap and **the exact solution at $`t = 20`$ equals the initial condition**. Any visible shift or ripple is therefore numerical error.
 
 ## Methods
 
-**Spatial schemes** (the derivative is applied as a periodic matrix $D \approx \Delta x\,\partial/\partial x$)
+**Spatial schemes.** Each scheme is applied as a periodic matrix $`D`$ with $`Du \approx \Delta x \, \partial u/\partial x`$.
 
-- **CD2**, second-order central difference: $u'_i \approx \dfrac{u_{i+1} - u_{i-1}}{2\Delta x}$
-- **CMPT4**, fourth-order tridiagonal compact scheme, where the derivative is defined implicitly:
-  $$\tfrac14 u'_{i-1} + u'_i + \tfrac14 u'_{i+1} = \frac{3}{4\Delta x}\left(u_{i+1} - u_{i-1}\right)$$
+*CD2*, second-order central difference:
 
-**Time schemes.** With $C = a\,\Delta t/\Delta x$ (the CFL number), each scheme reduces to a one-step matrix because the problem is linear with constant coefficients:
+```math
+u'_i \approx \frac{u_{i+1} - u_{i-1}}{2\Delta x}
+```
 
-- **Trapezoidal** (implicit, second-order): $\left(I + \tfrac{C}{2}D\right)u^{n+1} = \left(I - \tfrac{C}{2}D\right)u^n$
-- **RK4** (explicit, fourth-order): $u^{n+1} = \sum_{m=0}^{4} \dfrac{(-CD)^m}{m!}\,u^n$. For a linear system, classical RK4 is exactly this Taylor polynomial.
+*CMPT4*, fourth-order tridiagonal compact scheme, where the derivative is defined implicitly (a periodic tridiagonal system is solved for $`u'`$):
 
-**Fourier analysis.** For a mode $e^{ikx}$ with $\phi = k\Delta x$, the spatial operators have symbols $i\sin\phi$ (CD2) and $i\,\dfrac{1.5\sin\phi}{1 + 0.5\cos\phi}$ (CMPT4). Each time scheme turns this into a per-step amplification factor $G$. The numerical phase speed relative to the exact speed is $-\arg(G)/(C\phi)$, and $|G|^{n}$ is the amplitude left after $n$ steps.
+```math
+\frac{1}{4}u'_{i-1} + u'_i + \frac{1}{4}u'_{i+1} = \frac{3}{4\Delta x}\left(u_{i+1} - u_{i-1}\right)
+```
+
+**Time schemes.** With $`C = a\,\Delta t/\Delta x`$ (the CFL number), each scheme reduces to a one-step matrix because the problem is linear with constant coefficients.
+
+*Trapezoidal* (implicit, second-order):
+
+```math
+\left(I + \frac{C}{2}D\right)u^{n+1} = \left(I - \frac{C}{2}D\right)u^n
+```
+
+*RK4* (explicit, fourth-order). For a linear system, classical RK4 is exactly this Taylor polynomial:
+
+```math
+u^{n+1} = \sum_{m=0}^{4} \frac{(-CD)^m}{m!}\, u^n
+```
+
+**Fourier analysis.** For a mode $`e^{ikx}`$ with $`\phi = k\Delta x`$, the spatial operators have symbols $`i\sin\phi`$ (CD2) and $`i\,\frac{1.5\sin\phi}{1 + 0.5\cos\phi}`$ (CMPT4). Each time scheme turns this into a per-step amplification factor $`G`$. The numerical phase speed relative to the exact speed is $`-\arg(G)/(C\phi)`$, and $`|G|^n`$ is the amplitude left after $`n`$ steps.
 
 ## Studies
 
-1. **Scheme comparison** (`run_advection.m`): all four pairings at $(\Delta t, N) = (0.2, 40), (0.1, 40), (0.2, 80), (0.1, 80)$, with L2 and maximum nodal error against the exact solution.
-2. **Order of accuracy** (`study_convergence.m`): $N = 40, 80, 160, 320, 640$ at fixed CFL = 0.4, so $\Delta t$ shrinks with $\Delta x$. The observed order is $\log_2\left(E_N / E_{2N}\right)$.
-3. **Dispersion and dissipation** (`plot_scheme_spectra.m`): phase speed and amplitude for each pairing at $N = 40$, $\Delta t = 0.2$ (CFL = 0.4, 100 steps).
+1. **Scheme comparison** (`run_advection.m`): all four pairings at $`(\Delta t, N) = (0.2, 40), (0.1, 40), (0.2, 80), (0.1, 80)`$, with L2 and maximum nodal error against the exact solution.
+2. **Order of accuracy** (`study_convergence.m`): $`N = 40, 80, 160, 320, 640`$ at fixed CFL = 0.4, so $`\Delta t`$ shrinks with $`\Delta x`$. The observed order is $`\log_2(E_N / E_{2N})`$.
+3. **Dispersion and dissipation** (`plot_scheme_spectra.m`): phase speed and amplitude for each pairing at $`N = 40`$, $`\Delta t = 0.2`$ (CFL = 0.4, 100 steps).
 
-Errors are discrete L2 norms, $\sqrt{\Delta x \sum_i e_i^2}$, at the grid nodes. For scale, the exact solution has an L2 norm of about 1.33.
+Errors are discrete L2 norms, $`\sqrt{\Delta x \sum_i e_i^2}`$, at the grid nodes. For scale, the exact solution has an L2 norm of about 1.33.
 
 ## Results
 
