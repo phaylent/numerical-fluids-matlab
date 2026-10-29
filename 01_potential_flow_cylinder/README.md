@@ -1,6 +1,6 @@
 # Potential Flow Over a Circular Cylinder: Finite-Difference Solver
 
-A MATLAB solver for the stream function of steady, incompressible, irrotational flow past a circular cylinder. The solver uses second-order finite differences on a stretched polar mesh and a sparse direct solve. From the stream function I recover the velocity and pressure fields and the pressure forces on the cylinder, then use the exact solution to separate **discretization error** from **domain-truncation error**.
+A MATLAB solver for the stream function of steady, incompressible, irrotational flow past a circular cylinder. The solver uses second-order finite differences on a stretched polar mesh and a sparse direct solve. From the stream function I recover the velocity and pressure fields and the pressure forces on the cylinder, then use the exact solution to separate discretization error from domain-truncation error.
 
 ## Problem
 
